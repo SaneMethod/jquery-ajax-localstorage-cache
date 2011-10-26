@@ -8,7 +8,7 @@ jquery-ajax-jstorage-cache is a plugin build for jQuery (>1.5.1) and [jStorage](
 	$.ajax({
 		url: '/post',
 
-		cache: true,
+		cacheJStorage: true,
 		cacheKey: 'post',
 		isCacheValid: function(){
 			return true;
@@ -22,7 +22,7 @@ jquery-ajax-jstorage-cache is a plugin build for jQuery (>1.5.1) and [jStorage](
 On your AJAX request you got 3 new parameters :
 
 * cache
-	* Turn cache on/off
+	* Turn cacheJStorage on/off
 	* Default: false
 * cacheKey
 	* CacheKey is the key that will be used to store the response in jStorage. It allow you to delete your cache easily with the jStorage.removeKey() function.
