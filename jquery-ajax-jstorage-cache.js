@@ -1,6 +1,6 @@
 $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
   // Cache it ?
-  if( ! options.cache )
+  if( options.cacheJStorage  == undefined || ! options.cacheJStorage )
     return;
 
   var cacheKey;
