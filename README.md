@@ -21,7 +21,7 @@ jquery-ajax-jstorage-cache is a plugin build for jQuery (>1.5.1) and [jStorage](
 
 On your AJAX request you got 3 new parameters :
 
-* cache
+* cacheJStorage
 	* Turn cacheJStorage on/off
 	* Default: false
 * cacheKey
