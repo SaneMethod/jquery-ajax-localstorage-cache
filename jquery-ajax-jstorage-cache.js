@@ -12,7 +12,7 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
   
   // isCacheValid is a function to validate cache
   if( options.isCacheValid &&  ! options.isCacheValid() ){
-    $.jStorage.deleteKey( cackeKey );
+    $.jStorage.deleteKey( cacheKey );
   }
   
   if( $.jStorage.get ( cacheKey ) ){
