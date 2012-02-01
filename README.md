@@ -1,5 +1,5 @@
 # About 
-jquery-ajax-jstorage-cache is a plugin build for jQuery (>1.5.1) and [jStorage](http://www.jstorage.info) . It's a client-side cache plugin for AJAX response intended to save bandwith and time. All the responses are stored in the Local Storage powered by HTML5 (see [jStorage#Support](http://www.jstorage.info/#support)).
+jquery-ajax-localstorage-cache is a plugin built for jQuery (>1.5.1) and localStorage. It's a fork from the [jStorage-dependent original](https://github.com/nectify/jquery-ajax-jstorage-cache). It provides a client-side cache AJAX responses intended to save bandwith and time. 
 
 # How to use 
 
@@ -7,10 +7,11 @@ jquery-ajax-jstorage-cache is a plugin build for jQuery (>1.5.1) and [jStorage](
 
 	$.ajax({
 		url: '/post',
+		localCache: true,  // required to use
 
-		cacheJStorage: true,
-		cacheKey: 'post',
-		isCacheValid: function(){
+		cacheTTL : 1,      // in hours. Optional
+		cacheKey: 'post',  // optional
+		isCacheValid: function(){  // optional
 			return true;
 		},
 
@@ -21,19 +22,24 @@ jquery-ajax-jstorage-cache is a plugin build for jQuery (>1.5.1) and [jStorage](
 
 On your AJAX request you got 3 new parameters :
 
-* cacheJStorage
-	* Turn cacheJStorage on/off
+* localCache
+	* Turn localCache on/off
 	* Default: false
+* cacheTTL
+    * time in hours the entry should be valid. 
+    * only for this specific ajax request
+    * Default : 5 hours
 * cacheKey
-	* CacheKey is the key that will be used to store the response in jStorage. It allow you to delete your cache easily with the jStorage.removeKey() function.
+	* CacheKey is the key that will be used to store the response in localStorage. It allow you to delete your cache easily with the localStorage.remoteItem() function.
 	* Default: URL + TYPE(GET/POST) + DATA
 * isCacheValid
 	* This function must return true or false. On false, the cached response is removed.
 	* Default: null
 
+
 ## Notes
 
-* You can delete the cache by using jStorage API (see [jStorage#Usage](http://www.jstorage.info/#usage)).
+* You can delete the cache by using `localStorage.clear()`.
 * Note that you can pre-load content with this plugin. You just have do to the same AJAX request without a success callback and the same cacheKey.
 
 # License
