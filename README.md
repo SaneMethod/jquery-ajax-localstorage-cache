@@ -20,7 +20,7 @@ jquery-ajax-localstorage-cache is a plugin built for jQuery (>1.5.1) and localSt
 		}
 	});
 
-On your AJAX request you got 3 new parameters :
+On your AJAX request you got 4 new parameters :
 
 * localCache
 	* Turn localCache on/off
