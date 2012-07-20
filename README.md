@@ -4,7 +4,7 @@ jquery-ajax-localstorage-cache is a plugin built for jQuery (>1.5.1) and localSt
 # How to use 
 
 ## Parameters
-	```javascript
+```javascript
 	$.ajax({
 		url          : '/post',
 		localCache   : true,  // required to use
@@ -19,7 +19,7 @@ jquery-ajax-localstorage-cache is a plugin built for jQuery (>1.5.1) and localSt
 			// i can play with my reply ! 
 		}
 	});
-	```
+```
 On your AJAX request you got 4 new parameters :
 
 * localCache
