@@ -20,7 +20,7 @@ jquery-ajax-localstorage-cache is a plugin built for jQuery (>1.5.1) and localSt
 		}
 	});
 ```
-On your AJAX request you got 4 new parameters :
+On your AJAX request you get 4 new parameters :
 
 * localCache
 	* Turn localCache on/off
@@ -36,10 +36,9 @@ On your AJAX request you got 4 new parameters :
 	* This function must return true or false. On false, the cached response is removed.
 	* Default: null
 
-
 ## Notes
 
-* You can delete the cache by using `localStorage.clear()`.
+* You can delete the cache by using ```localStorage.clear()```.
 * Note that you can pre-load content with this plugin. You just have do to the same AJAX request without a success callback and the same cacheKey.
 
 # License
