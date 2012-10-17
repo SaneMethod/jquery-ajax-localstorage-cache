@@ -40,7 +40,17 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     options.success = function( data ) {
       var strdata = data;
       if ( this.dataType.indexOf( 'json' ) === 0 ) strdata = JSON.stringify( data );
-      localStorage.setItem( cacheKey, strdata );
+
+      // Save the data to localStorage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
+      try {
+        localStorage.setItem( cacheKey, strdata );
+      } catch (e) {
+        // Remove any incomplete data that may have been saved before the exception was caught
+        localStorage.removeItem( cacheKey );
+        localStorage.removeItem( cacheKey + 'cachettl' );
+        if ( options.cacheError ) options.cacheError( e, cacheKey, strdata );
+      }
+
       if ( options.realsuccess ) options.realsuccess( data );
     };
 
