@@ -43,6 +43,7 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
 
       // Save the data to localStorage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
       try {
+        localStorage.setItem( cacheKey  + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl );
         localStorage.setItem( cacheKey, strdata );
       } catch (e) {
         // Remove any incomplete data that may have been saved before the exception was caught
@@ -54,10 +55,5 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
       if ( options.realsuccess ) options.realsuccess( data );
     };
 
-    // store timestamp
-    if ( ! ttl || ttl === 'expired' ) {
-      localStorage.setItem( cacheKey  + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl );
-    }
-    
   }
 });
