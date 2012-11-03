@@ -20,7 +20,6 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
   if ( ttl && ttl < +new Date() ){
     localStorage.removeItem( cacheKey );
     localStorage.removeItem( cacheKey  + 'cachettl' );
-    ttl = 'expired';
   }
   
   var value = localStorage.getItem( cacheKey );
