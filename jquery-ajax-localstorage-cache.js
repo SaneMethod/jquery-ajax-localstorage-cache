@@ -6,6 +6,10 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
   // Cache it ?
   if ( !Modernizr.localstorage || !options.localCache ) return;
 
+  // Deprecation Notice: The jqXHR.success(), jqXHR.error(), and jqXHR.complete() callbacks are deprecated as of jQuery 1.8.
+  // Still support success for now
+  options.done = options.done || options.success;
+
   var hourstl = options.cacheTTL || 5;
 
   var cacheKey = options.cacheKey || 
@@ -25,19 +29,20 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
   
   var value = localStorage.getItem( cacheKey );
   if ( value ){
-    //In the cache? So get it, apply success callback & abort the XHR request
+    //In the cache? So get it, apply done callback & abort the XHR request
     // parse back to JSON if we can.
     if ( options.dataType.indexOf( 'json' ) === 0 ) value = JSON.parse( value );
-    options.success( value );
+    options.done( value );
     // Abort is broken on JQ 1.5 :(
     jqXHR.abort();
   } else {
 
-    //If it not in the cache, we change the success callback, just put data on localstorage and after that apply the initial callback
-    if ( options.success ) {
-      options.realsuccess = options.success;
+
+    //If it not in the cache, we change the done callback, just put data on localstorage and after that apply the initial callback
+    if ( options.done ) {
+      options.realdone = options.done;
     }  
-    options.success = function( data ) {
+    options.done = function( data ) {
       var strdata = data;
       if ( this.dataType.indexOf( 'json' ) === 0 ) strdata = JSON.stringify( data );
 
@@ -51,7 +56,7 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
         if ( options.cacheError ) options.cacheError( e, cacheKey, strdata );
       }
 
-      if ( options.realsuccess ) options.realsuccess( data );
+      if ( options.realdone ) options.realdone( data );
     };
 
     // store timestamp
