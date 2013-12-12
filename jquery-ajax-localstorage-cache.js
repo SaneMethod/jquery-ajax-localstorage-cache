@@ -2,9 +2,21 @@
 // dependent on Modernizr's localStorage test
 
 $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
-
+  
+  // Modernizr.localstorage, version 3 12/12/13
+  function localstorageExists() {
+    var mod = 'modernizr';
+    try {
+      localStorage.setItem(mod, mod);
+      localStorage.removeItem(mod);
+      return true;
+    } catch(e) {
+      return false;
+    }
+  }
+  
   // Cache it ?
-  if ( !Modernizr.localstorage || !options.localCache ) return;
+  if ( !localstorageExists() || !options.localCache ) return;
 
   var hourstl = options.cacheTTL || 5;
 
