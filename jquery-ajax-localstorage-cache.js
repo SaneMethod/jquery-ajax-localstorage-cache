@@ -9,7 +9,7 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
   var hourstl = options.cacheTTL || 5;
 
   var cacheKey = options.cacheKey || 
-                 options.url.replace( /jQuery.*/,'' ) + options.type + options.data;
+                 options.url.replace( /jQuery.*/,'' ) + options.type + (options.data || '');
   
   // isCacheValid is a function to validate cache
   if ( options.isCacheValid &&  ! options.isCacheValid() ){
