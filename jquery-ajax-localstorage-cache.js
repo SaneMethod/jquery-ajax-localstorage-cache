@@ -4,7 +4,7 @@
 $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
   
   // Modernizr.localstorage, version 3 12/12/13
-  function localstorageExists() {
+  function hasLocalStorage() {
     var mod = 'modernizr';
     try {
       localStorage.setItem(mod, mod);
@@ -16,7 +16,7 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
   }
   
   // Cache it ?
-  if ( !localstorageExists() || !options.localCache ) return;
+  if ( !hasLocalStorage() || !options.localCache ) return;
 
   var hourstl = options.cacheTTL || 5;
 
