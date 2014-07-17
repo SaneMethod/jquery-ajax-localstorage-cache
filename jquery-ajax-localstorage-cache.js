@@ -16,7 +16,9 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
   }
 
   // Cache it ?
-  if ( !hasLocalStorage() || !options.localCache ) return;
+  if ( !hasLocalStorage() || !options.localCache ) {
+    return;
+  }
 
   var hourstl = options.cacheTTL || 5;
 
@@ -41,15 +43,18 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
 
     //In the cache? So get it, apply success callback & abort the XHR request
     // parse back to JSON if we can.
-    if ( options.dataType.indexOf( 'json' ) === 0 ) value = JSON.parse( value );
-      if ( typeof options.success === 'function' ) {
-        options.success( value );
-      } else if (typeof options.success === 'object' ) {
-        var callbackContext = options.context || options;
-        while (options.success[ 0 ]) {
-          options.success.shift().apply(callbackContext, [value]);
-        }
+    if ( options.dataType.indexOf( 'json' ) === 0 ) {
+      value = JSON.parse(value);
+    }
+
+    if ( typeof options.success === 'function' ) {
+      options.success( value );
+    } else if (typeof options.success === 'object' ) {
+      var callbackContext = options.context || options;
+      while (options.success[ 0 ]) {
+        options.success.shift().apply(callbackContext, [value]);
       }
+    }
     // Abort is broken on JQ 1.5 :(
     jqXHR.abort();
   } else {
@@ -60,7 +65,9 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     }
     options.success = function( data, textStatus, jqXHR ) {
       var strdata = data;
-      if ( this.dataType.indexOf( 'json' ) === 0 ) strdata = JSON.stringify( data );
+      if ( this.dataType.indexOf( 'json' ) === 0 ) {
+        strdata = JSON.stringify(data);
+      }
 
       // Save the data to localStorage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
       try {
@@ -69,7 +76,9 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
         // Remove any incomplete data that may have been saved before the exception was caught
         localStorage.removeItem( cacheKey );
         localStorage.removeItem( cacheKey + 'cachettl' );
-        if ( options.cacheError ) options.cacheError( e, cacheKey, strdata );
+        if ( options.cacheError ) {
+          options.cacheError(e, cacheKey, strdata);
+        }
       }
 
       if ( typeof options.realsuccess === 'function' ) {
