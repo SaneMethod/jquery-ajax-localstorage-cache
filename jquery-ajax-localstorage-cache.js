@@ -36,11 +36,20 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
   }
 
   var value = localStorage.getItem( cacheKey );
+
   if ( value ){
+
     //In the cache? So get it, apply success callback & abort the XHR request
     // parse back to JSON if we can.
     if ( options.dataType.indexOf( 'json' ) === 0 ) value = JSON.parse( value );
-    options.success( value );
+      if ( typeof options.success === 'function' ) {
+        options.success( value );
+      } else if (typeof options.success === 'object' ) {
+        var callbackContext = options.context || options;
+        while (options.success[ 0 ]) {
+          options.success.shift().apply(callbackContext, [value]);
+        }
+      }
     // Abort is broken on JQ 1.5 :(
     jqXHR.abort();
   } else {
@@ -65,10 +74,11 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
 
       if ( typeof options.realsuccess === 'function' ) {
         options.realsuccess( data, textStatus, jqXHR );
-      } else if (typeof options.realsuccess === 'array' ) {
-        $.each(options.realsuccess, function ( index, successFunction ) {
-          successFunction(data, textStatus, jqXHR);
-        });
+      } else if (typeof options.realsuccess === 'object' ) {
+        var callbackContext = options.context || options;
+        while (options.realsuccess[ 0 ]) {
+          options.realsuccess.shift().apply(callbackContext, [data, textStatus, jqXHR]);
+        }
       }
     };
 
