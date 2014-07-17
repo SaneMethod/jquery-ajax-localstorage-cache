@@ -2,7 +2,7 @@
 // dependent on Modernizr's localStorage test
 
 $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
-  
+
   // Modernizr.localstorage, version 3 12/12/13
   function hasLocalStorage() {
     var mod = 'modernizr';
@@ -14,15 +14,15 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
       return false;
     }
   }
-  
+
   // Cache it ?
   if ( !hasLocalStorage() || !options.localCache ) return;
 
   var hourstl = options.cacheTTL || 5;
 
-  var cacheKey = options.cacheKey || 
+  var cacheKey = options.cacheKey ||
                  options.url.replace( /jQuery.*/,'' ) + options.type + (options.data || '');
-  
+
   // isCacheValid is a function to validate cache
   if ( options.isCacheValid &&  ! options.isCacheValid() ){
     localStorage.removeItem( cacheKey );
@@ -34,7 +34,7 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     localStorage.removeItem( cacheKey  + 'cachettl' );
     ttl = 'expired';
   }
-  
+
   var value = localStorage.getItem( cacheKey );
   if ( value ){
     //In the cache? So get it, apply success callback & abort the XHR request
@@ -48,8 +48,8 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     //If it not in the cache, we change the success callback, just put data on localstorage and after that apply the initial callback
     if ( options.success ) {
       options.realsuccess = options.success;
-    }  
-    options.success = function( data ) {
+    }
+    options.success = function( data, textStatus, jqXHR ) {
       var strdata = data;
       if ( this.dataType.indexOf( 'json' ) === 0 ) strdata = JSON.stringify( data );
 
@@ -63,13 +63,19 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
         if ( options.cacheError ) options.cacheError( e, cacheKey, strdata );
       }
 
-      if ( options.realsuccess ) options.realsuccess( data );
+      if ( typeof options.realsuccess === 'function' ) {
+        options.realsuccess( data, textStatus, jqXHR );
+      } else if (typeof options.realsuccess === 'array' ) {
+        $.each(options.realsuccess, function ( index, successFunction ) {
+          successFunction(data, textStatus, jqXHR);
+        });
+      }
     };
 
     // store timestamp
     if ( ! ttl || ttl === 'expired' ) {
       localStorage.setItem( cacheKey  + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl );
     }
-    
+
   }
 });
