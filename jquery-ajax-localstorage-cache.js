@@ -2,7 +2,7 @@
 // dependent on Modernizr's localStorage test
 
 $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
-  
+
   // Modernizr.localstorage, version 3 12/12/13
   function hasLocalStorage() {
     var mod = 'modernizr';
@@ -14,15 +14,17 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
       return false;
     }
   }
-  
+
   // Cache it ?
-  if ( !hasLocalStorage() || !options.localCache ) return;
+  if ( !hasLocalStorage() || !options.localCache ) {
+    return;
+  }
 
   var hourstl = options.cacheTTL || 5;
 
-  var cacheKey = options.cacheKey || 
+  var cacheKey = options.cacheKey ||
                  options.url.replace( /jQuery.*/,'' ) + options.type + (options.data || '');
-  
+
   // isCacheValid is a function to validate cache
   if ( options.isCacheValid &&  ! options.isCacheValid() ){
     localStorage.removeItem( cacheKey );
@@ -34,13 +36,25 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     localStorage.removeItem( cacheKey  + 'cachettl' );
     ttl = 'expired';
   }
-  
+
   var value = localStorage.getItem( cacheKey );
+
   if ( value ){
+
     //In the cache? So get it, apply success callback & abort the XHR request
     // parse back to JSON if we can.
-    if ( options.dataType.indexOf( 'json' ) === 0 ) value = JSON.parse( value );
-    options.success( value );
+    if ( options.dataType.indexOf( 'json' ) === 0 ) {
+      value = JSON.parse(value);
+    }
+
+    if ( typeof options.success === 'function' ) {
+      options.success( value );
+    } else if (typeof options.success === 'object' ) {
+      var callbackContext = options.context || options;
+      while (options.success[ 0 ]) {
+        options.success.shift().apply(callbackContext, [value]);
+      }
+    }
     // Abort is broken on JQ 1.5 :(
     jqXHR.abort();
   } else {
@@ -48,10 +62,12 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     //If it not in the cache, we change the success callback, just put data on localstorage and after that apply the initial callback
     if ( options.success ) {
       options.realsuccess = options.success;
-    }  
-    options.success = function( data ) {
+    }
+    options.success = function( data, textStatus, jqXHR ) {
       var strdata = data;
-      if ( this.dataType.indexOf( 'json' ) === 0 ) strdata = JSON.stringify( data );
+      if ( this.dataType.indexOf( 'json' ) === 0 ) {
+        strdata = JSON.stringify(data);
+      }
 
       // Save the data to localStorage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
       try {
@@ -60,16 +76,25 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
         // Remove any incomplete data that may have been saved before the exception was caught
         localStorage.removeItem( cacheKey );
         localStorage.removeItem( cacheKey + 'cachettl' );
-        if ( options.cacheError ) options.cacheError( e, cacheKey, strdata );
+        if ( options.cacheError ) {
+          options.cacheError(e, cacheKey, strdata);
+        }
       }
 
-      if ( options.realsuccess ) options.realsuccess( data );
+      if ( typeof options.realsuccess === 'function' ) {
+        options.realsuccess( data, textStatus, jqXHR );
+      } else if (typeof options.realsuccess === 'object' ) {
+        var callbackContext = options.context || options;
+        while (options.realsuccess[ 0 ]) {
+          options.realsuccess.shift().apply(callbackContext, [data, textStatus, jqXHR]);
+        }
+      }
     };
 
     // store timestamp
     if ( ! ttl || ttl === 'expired' ) {
       localStorage.setItem( cacheKey  + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl );
     }
-    
+
   }
 });
