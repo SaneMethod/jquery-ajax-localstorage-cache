@@ -33,6 +33,8 @@ On your AJAX request you get 4 new parameters :
     * time in hours the entry should be valid.
     * only for this specific ajax request
     * Default : 5 hours
+* cachePrefix
+	* Default: ajaxcache_
 * cacheKey
 	* CacheKey is the key that will be used to store the response in localStorage. It allow you to delete your cache easily with the localStorage.removeItem() function.
 	* Default: URL + TYPE(GET/POST) + DATA
