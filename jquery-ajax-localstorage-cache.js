@@ -19,7 +19,7 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     localCache: false,
     cacheTTL: 5,
     isCacheValid: function(){ return true },
-    isDataValid: function(){ return true },
+    isResponseValid: function(){ return true },
     cachePrefix: 'ajaxcache_'
   }, options);
 
