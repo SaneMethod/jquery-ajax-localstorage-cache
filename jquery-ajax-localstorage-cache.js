@@ -2,7 +2,7 @@
 // dependent on Modernizr's localStorage test
 
 $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
-  
+
   // Modernizr.localstorage, version 3 12/12/13
   function hasLocalStorage() {
     var mod = 'modernizr';
@@ -14,17 +14,26 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
       return false;
     }
   }
-  
+
+  options = $.extend({
+    localCache: false,
+    cacheTTL: 5,
+    isCacheValid: function(){ return true },
+    isResponseValid: function(){ return true },
+    cachePrefix: 'ajaxcache_'
+  }, options);
+
   // Cache it ?
   if ( !hasLocalStorage() || !options.localCache ) return;
 
-  var hourstl = options.cacheTTL || 5;
-
-  var cacheKey = options.cacheKey || 
+  var hourstl = options.cacheTTL,
+      cacheKey = options.cacheKey ||
                  options.url.replace( /jQuery.*/,'' ) + options.type + (options.data || '');
-  
+
+  cacheKey = options.cachePrefix + cacheKey;
+
   // isCacheValid is a function to validate cache
-  if ( options.isCacheValid &&  ! options.isCacheValid() ){
+  if ( !options.isCacheValid() ){
     localStorage.removeItem( cacheKey );
   }
   // if there's a TTL that's expired, flush this item
@@ -34,7 +43,7 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     localStorage.removeItem( cacheKey  + 'cachettl' );
     ttl = 'expired';
   }
-  
+
   var value = localStorage.getItem( cacheKey );
   if ( value ){
     //In the cache? So get it, apply success callback & abort the XHR request
@@ -48,19 +57,24 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     //If it not in the cache, we change the success callback, just put data on localstorage and after that apply the initial callback
     if ( options.success ) {
       options.realsuccess = options.success;
-    }  
+    }
     options.success = function( data ) {
       var strdata = data;
-      if ( this.dataType.indexOf( 'json' ) === 0 ) strdata = JSON.stringify( data );
 
-      // Save the data to localStorage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
-      try {
-        localStorage.setItem( cacheKey, strdata );
-      } catch (e) {
-        // Remove any incomplete data that may have been saved before the exception was caught
-        localStorage.removeItem( cacheKey );
-        localStorage.removeItem( cacheKey + 'cachettl' );
-        if ( options.cacheError ) options.cacheError( e, cacheKey, strdata );
+      if ( options.isResponseValid( data ) ) {
+
+        if ( this.dataType.indexOf( 'json' ) === 0 ) strdata = JSON.stringify( data );
+
+        // Save the data to localStorage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
+        try {
+          localStorage.setItem( cacheKey, strdata );
+        } catch (e) {
+          // Remove any incomplete data that may have been saved before the exception was caught
+          localStorage.removeItem( cacheKey );
+          localStorage.removeItem( cacheKey + 'cachettl' );
+          if ( options.cacheError ) options.cacheError( e, cacheKey, strdata );
+        }
+
       }
 
       if ( options.realsuccess ) options.realsuccess( data );
@@ -70,6 +84,6 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     if ( ! ttl || ttl === 'expired' ) {
       localStorage.setItem( cacheKey  + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl );
     }
-    
+
   }
 });
