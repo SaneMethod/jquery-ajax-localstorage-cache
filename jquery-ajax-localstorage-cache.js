@@ -15,6 +15,10 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     }
   }
 
+  options = $.extend({
+    isResponseValid: function(){ return true }
+  }, options);
+
   // Cache it ?
   if ( !hasLocalStorage() || !options.localCache ) return;
 
@@ -53,7 +57,7 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     options.success = function( data ) {
       var strdata = data;
 
-      if ( options.isDataValid && options.isDataValid(data) ) {
+      if ( options.isResponseValid( data ) ) {
 
         if ( this.dataType.indexOf( 'json' ) === 0 ) strdata = JSON.stringify( data );
 
