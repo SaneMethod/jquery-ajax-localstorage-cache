@@ -39,7 +39,7 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
   if ( value ){
     //In the cache? So get it, apply success callback & abort the XHR request
     // parse back to JSON if we can.
-    if ( options.dataType.indexOf( 'json' ) === 0 ) value = JSON.parse( value );
+    if ( options.dataType.toLowerCase().indexOf( 'json' ) === 0 ) value = JSON.parse( value );
     options.success( value );
     // Abort is broken on JQ 1.5 :(
     jqXHR.abort();
@@ -51,7 +51,7 @@ $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
     }  
     options.success = function( data ) {
       var strdata = data;
-      if ( this.dataType.indexOf( 'json' ) === 0 ) strdata = JSON.stringify( data );
+      if ( this.dataType.toLowerCase().indexOf( 'json' ) === 0 ) strdata = JSON.stringify( data );
 
       // Save the data to localStorage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
       try {
