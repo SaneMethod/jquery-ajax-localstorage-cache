@@ -1,75 +1,98 @@
-// github.com/paulirish/jquery-ajax-localstorage-cache
-// dependent on Modernizr's localStorage test
+/**
+ * https://github.com/SaneMethod/jquery-ajax-localstorage-cache
+ */
+(function($){
+    /**
+     * Prefilter for caching ajax calls.
+     * See also $.ajaxTransport for the elements that make this compatible with jQuery Deferred.
+     * New parameters available on the ajax call:
+     * localCache   : true // required - either a boolean (in which case localStorage is used), or an object
+     * implementing the Storage interface, in which case that object is used instead.
+     * cacheTTL     : 5,           // optional - cache time in hours, default is 5.
+     * cacheKey     : 'post',      // optional - key under which cached string will be stored
+     * isCacheValid : function  // optional - return true for valid, false for invalid
+     * @method $.ajaxPrefilter
+     * @param options {Object} Options for the ajax call, modified with ajax standard settings
+     */
+    $.ajaxPrefilter(function(options){
+        var storage = (options.localCache === true) ? window.localStorage : options.localCache,
+            hourstl = options.cacheTTL || 5,
+            cacheKey = options.cacheKey || options.url.replace(/jQuery.*/,'') + options.type + options.data,
+            ttl = storage.getItem(cacheKey + 'cachettl'),
+            cacheValid = options.isCacheValid,
+            value;
 
-$.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
-  
-  // Modernizr.localstorage, version 3 12/12/13
-  function hasLocalStorage() {
-    var mod = 'modernizr';
-    try {
-      localStorage.setItem(mod, mod);
-      localStorage.removeItem(mod);
-      return true;
-    } catch(e) {
-      return false;
-    }
-  }
-  
-  // Cache it ?
-  if ( !hasLocalStorage() || !options.localCache ) return;
+        if (!storage) return;
 
-  var hourstl = options.cacheTTL || 5;
+        if (cacheValid && typeof cacheValid === 'function' && !cacheValid()){
+            storage.removeItem(cacheKey);
+        }
 
-  var cacheKey = options.cacheKey || 
-                 options.url.replace( /jQuery.*/,'' ) + options.type + (options.data || '');
-  
-  // isCacheValid is a function to validate cache
-  if ( options.isCacheValid &&  ! options.isCacheValid() ){
-    localStorage.removeItem( cacheKey );
-  }
-  // if there's a TTL that's expired, flush this item
-  var ttl = localStorage.getItem(cacheKey + 'cachettl');
-  if ( ttl && ttl < +new Date() ){
-    localStorage.removeItem( cacheKey );
-    localStorage.removeItem( cacheKey  + 'cachettl' );
-    ttl = 'expired';
-  }
-  
-  var value = localStorage.getItem( cacheKey );
-  if ( value ){
-    //In the cache? So get it, apply success callback & abort the XHR request
-    // parse back to JSON if we can.
-    if ( options.dataType.toLowerCase().indexOf( 'json' ) === 0 ) value = JSON.parse( value );
-    options.success( value );
-    // Abort is broken on JQ 1.5 :(
-    jqXHR.abort();
-  } else {
+        if (ttl && ttl < +new Date()){
+            storage.removeItem( cacheKey );
+            storage.removeItem( cacheKey + 'cachettl' );
+            ttl = 'expired';
+        }
 
-    //If it not in the cache, we change the success callback, just put data on localstorage and after that apply the initial callback
-    if ( options.success ) {
-      options.realsuccess = options.success;
-    }  
-    options.success = function( data ) {
-      var strdata = data;
-      if ( this.dataType.toLowerCase().indexOf( 'json' ) === 0 ) strdata = JSON.stringify( data );
+        value = storage.getItem( cacheKey );
+        if (!value){
+            // If it not in the cache, we store the data, add success callback - normal callback will proceed
+            if (options.success) {
+                options.realsuccess = options.success;
+            }
+            options.success = function( data ) {
+                var strdata = data;
+                if (this.dataType.indexOf('json') === 0) strdata = JSON.stringify(data);
 
-      // Save the data to localStorage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
-      try {
-        localStorage.setItem( cacheKey, strdata );
-      } catch (e) {
-        // Remove any incomplete data that may have been saved before the exception was caught
-        localStorage.removeItem( cacheKey );
-        localStorage.removeItem( cacheKey + 'cachettl' );
-        if ( options.cacheError ) options.cacheError( e, cacheKey, strdata );
-      }
+                // Save the data to storage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
+                try {
+                    storage.setItem( cacheKey, strdata );
+                } catch (e) {
+                    // Remove any incomplete data that may have been saved before the exception was caught
+                    storage.removeItem( cacheKey );
+                    storage.removeItem( cacheKey + 'cachettl' );
+                    console.log('Cache Error:'+e, cacheKey, strdata );
+                }
 
-      if ( options.realsuccess ) options.realsuccess( data );
-    };
+                if (options.realsuccess) options.realsuccess(data);
+            };
 
-    // store timestamp
-    if ( ! ttl || ttl === 'expired' ) {
-      localStorage.setItem( cacheKey  + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl );
-    }
-    
-  }
-});
+            // store timestamp
+            if ( ! ttl || ttl === 'expired' ) {
+                storage.setItem( cacheKey + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl );
+            }
+        }
+    });
+
+    /**
+     * This function performs the fetch from cache portion of the functionality needed to cache ajax
+     * calls and still fulfill the jqXHR Deferred Promise interface.
+     * See also $.ajaxPrefilter
+     * @method $.ajaxTransport
+     * @params options {Object} Options for the ajax call, modified with ajax standard settings
+     */
+    $.ajaxTransport("+*", function(options){
+        if (options.localCache)
+        {
+            var cacheKey = options.cacheKey || options.url.replace(/jQuery.*/,'') + options.type + options.data,
+                storage = (options.localCache === true) ? window.localStorage : options.localCache,
+                value = (storage) ? storage.getItem(cacheKey) : false;
+
+            if (value){
+                // In the cache? Get it, parse it to json if the dataType is JSON,
+                // and call the completeCallback with the fetched value.
+                if (options.dataType.indexOf('json') === 0) value = JSON.parse(value);
+                return {
+                    send: function(headers, completeCallback) {
+                        var response = {};
+                        response[options.dataType] = value;
+                        completeCallback(200, 'success', response, '');
+                    },
+                    abort: function() {
+                        console.log("Aborted ajax transport for json cache.");
+                    }
+                };
+            }
+        }
+    });
+})(jQuery);

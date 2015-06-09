@@ -1,32 +1,36 @@
-jquery-ajax-localstorage-cache is a plugin built for jQuery (>1.5.1) and localStorage. It's a fork from the [jStorage-dependent original](https://github.com/nectify/jquery-ajax-jstorage-cache). It provides a client-side cache AJAX responses intended to save bandwith and time. 
+Jalc
+----
+jquery-ajax-localstorage-cache - abbreviated Jalc from here on, because the full name is a mouthful.
 
-## unmaintained
+Jalc is a plugin built for jQuery (> 1.5.1) and any object implementing the
+[storage interface](https://developer.mozilla.org/en-US/docs/Web/API/Storage), such as
+[localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
 
-This project is [not maintained any longer](https://github.com/paulirish/jquery-ajax-localstorage-cache/issues/26). Contact me if you'd like to take over ownership.
+It's built on a fork from the [jStorage-dependent original](https://github.com/nectify/jquery-ajax-jstorage-cache).
+It provides a client-side cache for AJAX responses intended to save bandwith and time.
 
-# How to use 
+# Usage
 
 ## Parameters
 ```javascript
 	$.ajax({
 		url          : '/post',
-		localCache   : true,        // required to use
+		localCache   : true,        // Required. Either a boolean, in which case localStorage will be used, or
+		an object that implements the Storage interface.
 
-		cacheTTL     : 1,           // in hours. Optional
-		cacheKey     : 'post',      // optional
-		isCacheValid : function(){  // optional
+		cacheTTL     : 1,           // Optional. In hours.
+		cacheKey     : 'post',      // optional.
+		isCacheValid : function(){  // optional.
 			return true;
-		},
-
-		success: function(reply) {
-			// i can play with my reply ! 
 		}
+	}).done(function(response){
+	    // The response is available here.
 	});
 ```
 On your AJAX request you get 4 new parameters :
 
 * localCache
-	* Turn localCache on/off
+	* Turn localCache on/off, or specify an object implementing the Storage interface to use.
 	* Default: false
 * cacheTTL
     * time in hours the entry should be valid. 
@@ -41,8 +45,11 @@ On your AJAX request you get 4 new parameters :
 
 ## Notes
 
-* You can delete the cache by using ```localStorage.clear()```.
-* Note that you can pre-load content with this plugin. You just have do to the same AJAX request without a success callback and the same cacheKey.
+* You can delete the cache by using ```localStorage.clear()```, or by using ```localStorage.removeItem('cacheKey')```
+if you specified a cacheKey. Note the above assumes you're using localStorage - replace as appropriate with your
+Storage interface implementing object.
+* Note that you can pre-load content with this plugin. You just have do to an initial AJAX request with the same
+cacheKey.
 
 # License
 
