@@ -22,14 +22,15 @@
      * @param options {Object} Options for the ajax call, modified with ajax standard settings
      */
     $.ajaxPrefilter(function(options){
-        var storage = (options.localCache === true) ? window.localStorage : options.localCache;
-        if (!storage) return;
-
-        var hourstl = options.cacheTTL || 5,
+        var storage = (options.localCache === true) ? window.localStorage : options.localCache,
+            hourstl = options.cacheTTL || 5,
             cacheKey = genCacheKey(options),
-            ttl = storage.getItem(cacheKey + 'cachettl'),
             cacheValid = options.isCacheValid,
+            ttl,
             value;
+
+        if (!storage) return;
+        ttl = storage.getItem(cacheKey + 'cachettl');
 
         if (cacheValid && typeof cacheValid === 'function' && !cacheValid()){
             storage.removeItem(cacheKey);
