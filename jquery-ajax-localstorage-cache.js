@@ -24,7 +24,8 @@
      * @returns {boolean|object}
      */
     var getStorage = function(storage){
-        if (typeof storage === "boolean") return ((storage === true) ? window.localStorage : false);
+        if (!storage) return false;
+        if (storage === true) return window.localStorage;
         if (typeof storage === "object" && 'getItem' in storage &&
             'removeItem' in storage && 'setItem' in storage)
         {
