@@ -1,13 +1,20 @@
 /**
  * https://github.com/SaneMethod/jquery-ajax-localstorage-cache
  */
-(function($){
+; (function($, window){
     /**
      * Generate the cache key under which to store the local data - either the cache key supplied,
      * or one generated from the url, the type and, if present, the data.
      */
-    var genCacheKey = function(options){
-        return options.cacheKey || options.url.replace(/jQuery.*/,'') + options.type + (options.data || '');
+    var genCacheKey = function (options) {
+        var url = options.url.replace(/jQuery.*/, '');
+
+        // Strip _={timestamp}, if cache is set to false
+        if (options.cache === false) {
+            url = url.replace(/([?&])_=[^&]*/, '');
+        }
+
+        return options.cacheKey || url + options.type + (options.data || '');
     };
     /**
      * Determine whether we're using localStorage or, if the user has specified something other than a boolean
@@ -120,4 +127,4 @@
             }
         }
     });
-})(jQuery);
+})(jQuery, window);
