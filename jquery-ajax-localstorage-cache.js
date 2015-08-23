@@ -10,6 +10,23 @@
         return options.cacheKey || options.url.replace(/jQuery.*/,'') + options.type + (options.data || '');
     };
     /**
+     * Determine whether we're using localStorage or, if the user has specified something other than a boolean
+     * value for options.localCache, whether the value appears to satisfy the plugin's requirements.
+     * Otherwise, throw a new TypeError indicating what type of value we expect.
+     * @param {boolean|object} storage
+     * @returns {boolean|object}
+     */
+    var getStorage = function(storage){
+        if (typeof storage === "boolean") return ((storage === true) ? window.localStorage : false);
+        if (typeof storage === "object" && 'getItem' in storage &&
+            'removeItem' in storage && 'setItem' in storage)
+        {
+            return storage;
+        }
+        throw new TypeError("localCache must either be a boolean value, " +
+            "or an object which implements the Storage interface.");
+    };
+    /**
      * Prefilter for caching ajax calls.
      * See also $.ajaxTransport for the elements that make this compatible with jQuery Deferred.
      * New parameters available on the ajax call:
@@ -22,7 +39,7 @@
      * @param options {Object} Options for the ajax call, modified with ajax standard settings
      */
     $.ajaxPrefilter(function(options){
-        var storage = (options.localCache === true) ? window.localStorage : options.localCache,
+        var storage = getStorage(options.localCache),
             hourstl = options.cacheTTL || 5,
             cacheKey = genCacheKey(options),
             cacheValid = options.isCacheValid,
@@ -83,7 +100,7 @@
         if (options.localCache)
         {
             var cacheKey = genCacheKey(options),
-                storage = (options.localCache === true) ? window.localStorage : options.localCache,
+                storage = getStorage(options.localCache),
                 value = (storage) ? storage.getItem(cacheKey) : false;
 
             if (value){
