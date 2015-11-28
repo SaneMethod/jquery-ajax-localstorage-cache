@@ -11,7 +11,7 @@ module.exports = function(grunt) {
                 banner:'<%= banner %>',
                 report:'min'
             },
-            behold:{
+            jalc:{
                 options:{
                     sourceMappingURL:'jalc.min.map',
                     sourceMapPrefix:2,
