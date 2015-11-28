@@ -1,5 +1,5 @@
 {
-    "name": "jquery-ajax-localstorage-cache",
+    "name": "jquery-cache",
     "homepage": "https://github.com/SaneMethod/jquery-ajax-localstorage-cache",
     "description": "Store ajax responses using the browser's local storage, or any Storage-interface compatible object.",
     "main": "jquery-ajax-localstorage-cache.js",
