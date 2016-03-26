@@ -52,7 +52,7 @@ Storage interface implementing object.
 cacheKey.
 * In most cases, you can rely on the 'intelligent guess' for the
 [dataType jQuery ajax parameter](http://api.jquery.com/jquery.ajax/), and leave off the ```dataType``` parameter,
-and the plugin will store the content type returned from the server alongside the the data. However, you will
+and the plugin will store the content type returned from the server alongside the data. However, you will
  get more consistent results if you explicitly specify the dataType in the ajax parameters.
 
 
