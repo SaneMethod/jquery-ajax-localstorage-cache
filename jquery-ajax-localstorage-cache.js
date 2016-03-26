@@ -16,6 +16,7 @@
 
         return options.cacheKey || url + options.type + (options.data || '');
     };
+
     /**
      * Determine whether we're using localStorage or, if the user has specified something other than a boolean
      * value for options.localCache, whether the value appears to satisfy the plugin's requirements.
@@ -34,6 +35,18 @@
         throw new TypeError("localCache must either be a boolean value, " +
             "or an object which implements the Storage interface.");
     };
+
+    /**
+     * Remove the item specified by cacheKey and its attendant meta items from storage.
+     * @param {Storage|object} storage
+     * @param {string} cacheKey
+     */
+    var removeFromStorage = function(storage, cacheKey){
+        storage.removeItem(cacheKey);
+        storage.removeItem(cacheKey + 'cachettl');
+        storage.removeItem(cacheKey + 'dataType');
+    };
+
     /**
      * Prefilter for caching ajax calls.
      * See also $.ajaxTransport for the elements that make this compatible with jQuery Deferred.
@@ -58,12 +71,12 @@
         ttl = storage.getItem(cacheKey + 'cachettl');
 
         if (cacheValid && typeof cacheValid === 'function' && !cacheValid()){
-            storage.removeItem(cacheKey);
+            removeFromStorage(storage, cacheKey);
+            ttl = 0;
         }
 
         if (ttl && ttl < +new Date()){
-            storage.removeItem(cacheKey);
-            storage.removeItem(cacheKey + 'cachettl');
+            removeFromStorage(storage, cacheKey);
             ttl = 0;
         }
 
@@ -82,15 +95,13 @@
                 // Save the data to storage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
                 try {
                     storage.setItem(cacheKey, strdata);
-                    // store timestamp
-                    if (!ttl){
-                        storage.setItem(cacheKey + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl);
-                    }
+                    // Store timestamp and dataType
+                    storage.setItem(cacheKey + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl);
+                    storage.setItem(cacheKey + 'dataType', dataType);
                 } catch (e) {
                     // Remove any incomplete data that may have been saved before the exception was caught
-                    storage.removeItem(cacheKey);
-                    storage.removeItem(cacheKey + 'cachettl');
-                    console.log('Cache Error:'+e, cacheKey, strdata );
+                    removeFromStorage(storage, cacheKey);
+                    console.log('Cache Error:'+e, cacheKey, strdata);
                 }
 
                 if (options.realsuccess) options.realsuccess(data, status, jqXHR);
@@ -110,16 +121,17 @@
         {
             var cacheKey = genCacheKey(options),
                 storage = getStorage(options.localCache),
+                dataType = options.dataType || storage.getItem(cacheKey + 'dataType') || 'text',
                 value = (storage) ? storage.getItem(cacheKey) : false;
 
             if (value){
                 // In the cache? Get it, parse it to json if the dataType is JSON,
                 // and call the completeCallback with the fetched value.
-                if (options.dataType.toLowerCase().indexOf('json') === 0) value = JSON.parse(value);
+                if (dataType.toLowerCase().indexOf('json') !== -1) value = JSON.parse(value);
                 return {
                     send: function(headers, completeCallback) {
                         var response = {};
-                        response[options.dataType] = value;
+                        response[dataType] = value;
                         completeCallback(200, 'success', response, '');
                     },
                     abort: function() {
