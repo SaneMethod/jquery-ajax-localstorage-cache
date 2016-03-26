@@ -73,13 +73,19 @@
             if (options.success) {
                 options.realsuccess = options.success;
             }
-            options.success = function(data) {
-                var strdata = data;
-                if (this.dataType.toLowerCase().indexOf('json') === 0) strdata = JSON.stringify(data);
+            options.success = function(data, status, jqXHR) {
+                var strdata = data,
+                    dataType = this.dataType || jqXHR.getResponseHeader('Content-Type');
+
+                if (dataType.toLowerCase().indexOf('json') !== -1) strdata = JSON.stringify(data);
 
                 // Save the data to storage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
                 try {
                     storage.setItem(cacheKey, strdata);
+                    // store timestamp
+                    if (!ttl){
+                        storage.setItem(cacheKey + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl);
+                    }
                 } catch (e) {
                     // Remove any incomplete data that may have been saved before the exception was caught
                     storage.removeItem(cacheKey);
@@ -87,13 +93,8 @@
                     console.log('Cache Error:'+e, cacheKey, strdata );
                 }
 
-                if (options.realsuccess) options.realsuccess(data);
+                if (options.realsuccess) options.realsuccess(data, status, jqXHR);
             };
-
-            // store timestamp
-            if (!ttl){
-                storage.setItem(cacheKey + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl);
-            }
         }
     });
 

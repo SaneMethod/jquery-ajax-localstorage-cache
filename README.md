@@ -48,8 +48,13 @@ On your AJAX request you get 4 new parameters :
 * You can delete the cache by using ```localStorage.clear()```, or by using ```localStorage.removeItem('cacheKey')```
 if you specified a cacheKey. Note the above assumes you're using localStorage - replace as appropriate with your
 Storage interface implementing object.
-* Note that you can pre-load content with this plugin. You just have do to an initial AJAX request with the same
+* You can pre-load content with this plugin. You just have do to an initial AJAX request with the same
 cacheKey.
+* In most cases, you can rely on the 'intelligent guess' for the
+[dataType jQuery ajax parameter](http://api.jquery.com/jquery.ajax/), and leave off the ```dataType``` parameter;
+however, if you're requesting/expecting json, you *must* specify ```dataType:'json'``` if you want the cached value
+to be returned as an object - otherwise you will receive a JSON string.
+
 
 # License
 
