@@ -9,9 +9,7 @@ Jalc is a plugin built for jQuery (> 1.5.1) and any object implementing the
 It's built on a fork from the [jStorage-dependent original](https://github.com/nectify/jquery-ajax-jstorage-cache).
 It provides a client-side cache for AJAX responses intended to save bandwith and time.
 
-#### Looking for a version that supports binary data ([Blobs](https://developer.mozilla.org/en/docs/Web/API/Blob),
-[ArrayBuffers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer))?
-[Check out Jalic](https://github.com/SaneMethod/jalic).
+#### Looking for a version that supports binary data ([Blobs](https://developer.mozilla.org/en/docs/Web/API/Blob), [ArrayBuffers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer))? [Check out Jalic](https://github.com/SaneMethod/jalic).
 
 # Usage
 
