@@ -11,6 +11,8 @@ It provides a client-side cache for AJAX responses intended to save bandwith and
 
 #### Looking for a version that supports binary data ([Blobs](https://developer.mozilla.org/en/docs/Web/API/Blob), [ArrayBuffers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer))? [Check out Jalic](https://github.com/SaneMethod/jalic).
 
+#### Looking for a version that offers caching for the new [Fetch API](https://developer.mozilla.org/en/docs/Web/API/Fetch_API)? [Check out fetchCache](https://github.com/SaneMethod/fetchCache).
+
 # Usage
 
 ## Parameters
