@@ -42,6 +42,7 @@ On your AJAX request you get 4 new parameters :
     * Default : 5 hours
 * cacheKey
 	* CacheKey is the key that will be used to store the response in localStorage. It allow you to delete your cache easily with the localStorage.removeItem() function.
+	* callback function can also be used to return dynamically generated cacheKey. ajax options are passed to this callback, but keep in mind same parameters should return same cacheKey.
 	* Default: URL + TYPE(GET/POST) + DATA
 * isCacheValid
 	* This function must return true or false. On false, the cached response is removed.
