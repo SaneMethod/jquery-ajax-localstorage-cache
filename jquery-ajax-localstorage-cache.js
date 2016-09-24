@@ -8,11 +8,10 @@
      */
     var genCacheKey = function (options) {
         var url = options.url.replace(/jQuery.*/, '');
-        //in case cachey key is required to be generated dynamically by a function
-        if(
-            options.cacheKey && 
-            typeof options.cacheKey === 'function'
-        ) {
+
+        // If cacheKey is specified as a function, return the result of calling that function
+        // as the cacheKey.
+        if (options.cacheKey && typeof options.cacheKey === 'function'){
             return options.cacheKey(options);
         }
 
