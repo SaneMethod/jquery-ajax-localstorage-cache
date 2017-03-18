@@ -20,7 +20,7 @@ It provides a client-side cache for AJAX responses intended to save bandwith and
 	$.ajax({
 		url          : '/post',
 		localCache   : true,        // Required. Either a boolean, in which case localStorage will be used, or
-		an object that implements the Storage interface.
+		                            // an object that implements the Storage interface.
 
 		cacheTTL     : 1,           // Optional. In hours.
 		cacheKey     : 'post',      // optional.
