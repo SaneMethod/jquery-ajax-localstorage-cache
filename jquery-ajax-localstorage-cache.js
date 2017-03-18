@@ -6,13 +6,14 @@
      * Generate the cache key under which to store the local data - either the cache key supplied,
      * or one generated from the url, the type and, if present, the data.
      */
-    var genCacheKey = function (options) {
+    var genCacheKey = function(options) {
         var url = options.url.replace(/jQuery.*/, '');
 
-        // If cacheKey is specified as a function, return the result of calling that function
-        // as the cacheKey.
-        if (options.cacheKey && typeof options.cacheKey === 'function'){
-            return options.cacheKey(options);
+        // If cacheKey is specified, and a function, return the result of calling that function
+        // as the cacheKey. Otherwise, just return the specified cacheKey as-is.
+        if (options.cacheKey){
+            return (typeof options.cacheKey === 'function') ?
+                options.cacheKey(options) : options.cacheKey;
         }
 
         // Strip _={timestamp}, if cache is set to false
@@ -20,7 +21,7 @@
             url = url.replace(/([?&])_=[^&]*/, '');
         }
 
-        return options.cacheKey || url + options.type + (options.data || '');
+        return url + options.type + (options.data || '');
     };
 
     /**
@@ -68,7 +69,7 @@
     $.ajaxPrefilter(function(options){
         var storage = getStorage(options.localCache),
             hourstl = options.cacheTTL || 5,
-            cacheKey = genCacheKey(options),
+            cacheKey = options.cacheKey = genCacheKey(options),
             cacheValid = options.isCacheValid,
             ttl,
             value;
@@ -120,12 +121,13 @@
      * calls and still fulfill the jqXHR Deferred Promise interface.
      * See also $.ajaxPrefilter
      * @method $.ajaxTransport
-     * @params options {Object} Options for the ajax call, modified with ajax standard settings
+     * @params options {Object} Options for the ajax call, modified with ajax standard settings and our
+     * cacheKey for this call as determined in prefilter.
      */
     $.ajaxTransport("+*", function(options){
         if (options.localCache)
         {
-            var cacheKey = genCacheKey(options),
+            var cacheKey = options.cacheKey,
                 storage = getStorage(options.localCache),
                 dataType = options.dataType || storage.getItem(cacheKey + 'dataType') || 'text',
                 value = (storage) ? storage.getItem(cacheKey) : false;
