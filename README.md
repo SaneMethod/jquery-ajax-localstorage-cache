@@ -26,6 +26,9 @@ It provides a client-side cache for AJAX responses intended to save bandwith and
 		cacheKey     : 'post',      // optional.
 		isCacheValid : function(){  // optional.
 			return true;
+		},
+		isResponseValid : function(data, status, jqXHR){  // optional.
+			return data.code === '0';
 		}
 	}).done(function(response){
 	    // The response is available here.
