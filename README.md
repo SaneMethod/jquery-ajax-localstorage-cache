@@ -34,7 +34,7 @@ It provides a client-side cache for AJAX responses intended to save bandwith and
 	    // The response is available here.
 	});
 ```
-On your AJAX request you get 4 new parameters :
+On your AJAX request you get 5 new parameters :
 
 * localCache
 	* Turn localCache on/off, or specify an object implementing the Storage interface to use.
