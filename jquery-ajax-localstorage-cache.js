@@ -71,6 +71,7 @@
             hourstl = options.cacheTTL || 5,
             cacheKey = options.cacheKey = genCacheKey(options),
             cacheValid = options.isCacheValid,
+            responseValid = options.isResponseValid,
             ttl,
             value;
 
@@ -97,18 +98,22 @@
                 var strdata = data,
                     dataType = this.dataType || jqXHR.getResponseHeader('Content-Type');
 
-                if (dataType.toLowerCase().indexOf('json') !== -1) strdata = JSON.stringify(data);
+                if ( ! (responseValid && typeof responseValid === 'function' && ! responseValid(data, status, jqXHR)) ) {
 
-                // Save the data to storage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
-                try {
-                    storage.setItem(cacheKey, strdata);
-                    // Store timestamp and dataType
-                    storage.setItem(cacheKey + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl);
-                    storage.setItem(cacheKey + 'dataType', dataType);
-                } catch (e) {
-                    // Remove any incomplete data that may have been saved before the exception was caught
-                    removeFromStorage(storage, cacheKey);
-                    console.log('Cache Error:'+e, cacheKey, strdata);
+                    if (dataType.toLowerCase().indexOf('json') !== -1) strdata = JSON.stringify(data);
+
+                    // Save the data to storage catching exceptions (possibly QUOTA_EXCEEDED_ERR)
+                    try {
+                        storage.setItem(cacheKey, strdata);
+                        // Store timestamp and dataType
+                        storage.setItem(cacheKey + 'cachettl', +new Date() + 1000 * 60 * 60 * hourstl);
+                        storage.setItem(cacheKey + 'dataType', dataType);
+                    } catch (e) {
+                        // Remove any incomplete data that may have been saved before the exception was caught
+                        removeFromStorage(storage, cacheKey);
+                        console.log('Cache Error:'+e, cacheKey, strdata);
+                    }
+
                 }
 
                 if (options.realsuccess) options.realsuccess(data, status, jqXHR);
