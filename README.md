@@ -50,6 +50,10 @@ On your AJAX request you get 4 new parameters :
 * isCacheValid
 	* This function must return true or false. On false, the cached response is removed.
 	* Default: null
+* isResponseValid
+    * This function must return a 'truthy' value (boolean, or coercable to boolean). On falsey, the response
+    from the server is not cached.
+    * Default: null
 
 ## Notes
 

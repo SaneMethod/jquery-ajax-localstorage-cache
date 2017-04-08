@@ -2,11 +2,15 @@
  * https://github.com/SaneMethod/jquery-ajax-localstorage-cache
  */
 ; (function($, window){
+    'use strict';
+
     /**
      * Generate the cache key under which to store the local data - either the cache key supplied,
      * or one generated from the url, the type and, if present, the data.
      */
     var genCacheKey = function(options) {
+        var url;
+
         // If cacheKey is specified, and a function, return the result of calling that function
         // as the cacheKey. Otherwise, just return the specified cacheKey as-is.
         if (options.cacheKey){
@@ -14,7 +18,7 @@
                 options.cacheKey(options) : options.cacheKey;
         }
 
-        var url = options.url.replace(/jQuery.*/, '');
+        url = options.url.replace(/jQuery.*/, '');
 
         // Strip _={timestamp}, if cache is set to false
         if (options.cache === false) {
@@ -61,8 +65,9 @@
      * localCache   : true // required - either a boolean (in which case localStorage is used), or an object
      * implementing the Storage interface, in which case that object is used instead.
      * cacheTTL     : 5,           // optional - cache time in hours, default is 5.
-     * cacheKey     : 'post',      // optional - key under which cached string will be stored
-     * isCacheValid : function  // optional - return true for valid, false for invalid
+     * cacheKey     : 'post',      // optional - key under which cached string will be stored.
+     * isCacheValid : function  // optional - return true for valid, false for invalid.
+     * isResponseValid: function // optional - return true to cache response, false to skip caching response.
      * @method $.ajaxPrefilter
      * @param options {Object} Options for the ajax call, modified with ajax standard settings
      */
@@ -98,7 +103,7 @@
                 var strdata = data,
                     dataType = this.dataType || jqXHR.getResponseHeader('Content-Type');
 
-                if ( ! (responseValid && typeof responseValid === 'function' && ! responseValid(data, status, jqXHR)) ) {
+                if (!(responseValid && typeof responseValid === 'function' && !responseValid(data, status, jqXHR))) {
 
                     if (dataType.toLowerCase().indexOf('json') !== -1) strdata = JSON.stringify(data);
 
