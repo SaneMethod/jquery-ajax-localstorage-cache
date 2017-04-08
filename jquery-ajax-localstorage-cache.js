@@ -7,14 +7,14 @@
      * or one generated from the url, the type and, if present, the data.
      */
     var genCacheKey = function(options) {
-        var url = options.url.replace(/jQuery.*/, '');
-
         // If cacheKey is specified, and a function, return the result of calling that function
         // as the cacheKey. Otherwise, just return the specified cacheKey as-is.
         if (options.cacheKey){
             return (typeof options.cacheKey === 'function') ?
                 options.cacheKey(options) : options.cacheKey;
         }
+
+        var url = options.url.replace(/jQuery.*/, '');
 
         // Strip _={timestamp}, if cache is set to false
         if (options.cache === false) {
