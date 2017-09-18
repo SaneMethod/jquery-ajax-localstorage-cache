@@ -16,6 +16,15 @@ Versions tagged 2.x.x support jQuery 3.0.0+.
 
 #### Looking for a version that offers caching for the new [Fetch API](https://developer.mozilla.org/en/docs/Web/API/Fetch_API)? [Check out fetchCache](https://github.com/SaneMethod/fetchCache).
 
+# Bower
+You can download and install this plugin using bower:
+```
+bower install jalc
+```
+
+You can also download the minified distribution version and install manually in your application:
+[jalc.min.js](https://raw.githubusercontent.com/SaneMethod/jquery-ajax-localstorage-cache/master/dist/jalc.min.js).
+
 # Usage
 
 ## Parameters
