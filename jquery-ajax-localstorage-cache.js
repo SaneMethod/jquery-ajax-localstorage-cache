@@ -68,15 +68,20 @@
      * cacheKey     : 'post',      // optional - key under which cached string will be stored.
      * isCacheValid : function  // optional - return true for valid, false for invalid.
      * isResponseValid: function // optional - return true to cache response, false to skip caching response.
+     * thenResponse: function // optional - chains on request to potentially alter the response data that
+     * gets stored - must return whatever you want stored.
      * @method $.ajaxPrefilter
-     * @param options {Object} Options for the ajax call, modified with ajax standard settings
+     * @param options {Object} Options for the ajax call, modified with ajax standard settings.
+     * @param orginalOptions {object} Options for ajax as specified in the original call.
+     * @param jqXHR {jQuery.xhr} jQuery ajax object.
      */
-    $.ajaxPrefilter(function(options){
+    $.ajaxPrefilter(function(options, originalOptions, jqXHR){
         var storage = getStorage(options.localCache),
             hourstl = options.cacheTTL || 5,
             cacheKey = options.cacheKey = genCacheKey(options),
             cacheValid = options.isCacheValid,
             responseValid = options.isResponseValid,
+            thenResponse = options.thenResponse || null,
             ttl,
             value;
 
@@ -95,13 +100,10 @@
 
         value = storage.getItem(cacheKey);
         if (!value){
-            // If it not in the cache, we store the data, add success callback - normal callback will proceed
-            if (options.success) {
-                options.realsuccess = options.success;
-            }
-            options.success = function(data, status, jqXHR) {
+            // If value not in the cache, add a then block to request to store the results on success.
+            jqXHR.then(thenResponse).then(function(data, status, jqXHR){
                 var strdata = data,
-                    dataType = this.dataType || jqXHR.getResponseHeader('Content-Type') || 'text/plain';
+                    dataType = options.dataType || jqXHR.getResponseHeader('Content-Type') || 'text/plain';
 
                 if (!(responseValid && typeof responseValid === 'function' && !responseValid(data, status, jqXHR))) {
 
@@ -118,11 +120,8 @@
                         removeFromStorage(storage, cacheKey);
                         console.log('Cache Error:'+e, cacheKey, strdata);
                     }
-
                 }
-
-                if (options.realsuccess) options.realsuccess(data, status, jqXHR);
-            };
+            });
         }
     });
 

@@ -11,6 +11,6 @@
     "ignore":[],
     "license": "Apache-2.0",
     "dependencies": {
-        "jquery": ">=1.5.1"
+        "jquery": ">=3.0.0"
     }
 }
