@@ -101,7 +101,7 @@
             }
             options.success = function(data, status, jqXHR) {
                 var strdata = data,
-                    dataType = this.dataType || jqXHR.getResponseHeader('Content-Type');
+                    dataType = this.dataType || jqXHR.getResponseHeader('Content-Type') || 'text/plain';
 
                 if (!(responseValid && typeof responseValid === 'function' && !responseValid(data, status, jqXHR))) {
 
