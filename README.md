@@ -28,13 +28,14 @@ You can also download the minified distribution version and install manually in 
 # Usage
 
 ## Parameters
+
 ```javascript
 	$.ajax({
 		url          : '/post',
 		localCache   : true,        // Required. Either a boolean, in which case localStorage will be used, or
 		                            // an object that implements the Storage interface.
 
-		cacheTTL     : 1,           // Optional. In hours.
+		cacheTTL     : 1,           // Optional. In hours. Can be used with float to indicate part of an hour, e.g. 0.5.
 		cacheKey     : 'post',      // optional.
 		isCacheValid : function(){  // optional.
 			return true;
@@ -51,22 +52,24 @@ You can also download the minified distribution version and install manually in 
 	    // The response is available here.
 	});
 ```
-On your AJAX request you get 5 new parameters :
+
+On your AJAX request you get 6 new parameters :
 
 * localCache
 	* Turn localCache on/off, or specify an object implementing the Storage interface to use.
 	* Default: false
 * cacheTTL
-    * time in hours the entry should be valid. 
-    * only for this specific ajax request
+    * How long, in hours, the cached values should be considered valid.
+    * Floats can be used to indicate some part of an hour, e.g. `0.5` to indicate half-an-hour.
+    * Applies to cacheKey specified/calculated - each cached object will respect it's own cacheTTL, there is no
+    'global' TTL timer for all cached objects.
     * Default : 5 hours
 * cacheKey
-	* CacheKey is the key that will be used to store the response in localStorage. It allow you to delete your
-	cache easily with the localStorage.removeItem() function.
-	* A callback function can also be used to return dynamically generated cacheKey. ajax options are passed to
+	* CacheKey is the key that will be used to store the response in localStorage.
+	* A callback function can also be used to return dynamically generated cacheKey. Ajax options are passed to
 	this callback, but keep in mind that the function needs to return a stable cacheKey - that is, for a given set
 	of parameters, the function should always return the same generated cacheKey.
-	* Default: URL + TYPE(GET/POST) + DATA
+	* Default: URL + TYPE(GET/POST) + DATA (coerced to string)
 * isCacheValid
 	* This function must return true or false. On false, the cached response is removed.
 	* Default: null
