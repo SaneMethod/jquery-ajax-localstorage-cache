@@ -30,27 +30,27 @@ You can also download the minified distribution version and install manually in 
 ## Parameters
 
 ```javascript
-	$.ajax({
-		url          : '/post',
-		localCache   : true,        // Required. Either a boolean, in which case localStorage will be used, or
-		                            // an object that implements the Storage interface.
+$.ajax({
+    url: '/post',
+    localCache: true,        // Required. Either a boolean, in which case localStorage will be used, or
+                             // an object that implements the Storage interface.
 
-		cacheTTL     : 1,           // Optional. In hours. Can be used with float to indicate part of an hour, e.g. 0.5.
-		cacheKey     : 'post',      // optional.
-		isCacheValid : function(){  // optional.
-			return true;
-		},
-		isResponseValid : function(data, status, jqXHR){  // optional.
-			return data.code === '0';
-		},
-		thenResponse: function(data, status, jqXHR){ // optional, only in versions 2.x.x+
-            // Alter data in whatever way you want it altered before it gets cached.
-            data.code = 101;
-            return data;
-		}
-	}).done(function(response){
-	    // The response is available here.
-	});
+    cacheTTL: 1,           // Optional. In hours. Can be used with float to indicate part of an hour, e.g. 0.5.
+    cacheKey: 'post',      // optional.
+    isCacheValid: function () {  // optional.
+        return true;
+    },
+    isResponseValid: function (data, status, jqXHR) {  // optional.
+        return data.code === '0';
+    },
+    thenResponse: function (data, status, jqXHR) { // optional, only in versions 2.x.x+
+        // Alter data in whatever way you want it altered before it gets cached.
+        data.code = 101;
+        return data;
+    }
+}).done(function (response) {
+    // The response is available here.
+});
 ```
 
 On your AJAX request you get 6 new parameters :
