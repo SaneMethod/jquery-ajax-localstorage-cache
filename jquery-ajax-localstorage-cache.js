@@ -83,13 +83,22 @@
             responseValid = options.isResponseValid,
             thenResponse = options.thenResponse || null,
             ttl,
+            dataType,
             value;
 
         if (!storage) return;
         ttl = storage.getItem(cacheKey + 'cachettl');
 
-        if (cacheValid && typeof cacheValid === 'function' && !cacheValid()){
+        value = storage.getItem(cacheKey);
+
+        if (value){
+            dataType = options.dataType || storage.getItem(cacheKey + 'dataType') || 'text';
+            if (dataType.toLowerCase().indexOf('json') !== -1) value = JSON.parse(value);
+        }
+
+        if (cacheValid && typeof cacheValid === 'function' && !cacheValid(value)){
             removeFromStorage(storage, cacheKey);
+            value = null;
             ttl = 0;
         }
 
@@ -98,7 +107,6 @@
             ttl = 0;
         }
 
-        value = storage.getItem(cacheKey);
         if (!value){
             // If value not in the cache, add a then block to request to store the results on success.
             jqXHR.then(thenResponse).then(function(data, status, jqXHR){

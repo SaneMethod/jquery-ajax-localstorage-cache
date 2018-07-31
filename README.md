@@ -37,8 +37,8 @@ $.ajax({
 
     cacheTTL: 1,           // Optional. In hours. Can be used with float to indicate part of an hour, e.g. 0.5.
     cacheKey: 'post',      // optional.
-    isCacheValid: function () {  // optional.
-        return true;
+    isCacheValid: function (data) {  // optional.
+        return data && data.code === '0';
     },
     isResponseValid: function (data, status, jqXHR) {  // optional.
         return data.code === '0';
